@@ -376,6 +376,21 @@
             padding-left: 0;
         }
 
+        .footer {
+            position: fixed; /* Fixed position for footer */
+            bottom: -10px; /* Adjust position relative to bottom */
+            left: 0px;
+            right: 0px;
+            height: 40px; /* Footer height */
+
+            /* Styling */
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            font-size: 8pt;
+            color: #888;
+        }
+
     </style>
 
     @if (App::isLocale('th'))
@@ -445,6 +460,10 @@
                 {!! $notes !!}
             @endif
         </div>
+    </div>
+    <div class="footer">
+        Thank you for your business! | {{ $invoice->customer->company->name ?? 'Your Company Name' }}
+        {{-- You can add more footer info like page numbers if your PDF generator supports it --}}
     </div>
 </body>
 
