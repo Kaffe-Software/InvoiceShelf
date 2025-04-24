@@ -1,365 +1,392 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <title>Invoice - {{ $invoice->invoice_number }}</title>
+    <title>@lang('pdf_invoice_label') - {{ $invoice->invoice_number }}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style type="text/css">
-        /* -- Base Styles -- */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* -- Base & Typography -- */
         body {
-            font-family: 'Inter', 'DejaVu Sans', sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
+            font-family: "DejaVu Sans", sans-serif; /* DejaVu Sans is good for UTF-8 in PDFs */
+            font-size: 10pt;
             color: #333;
-            background-color: #fff;
             margin: 0;
             padding: 0;
         }
 
-        /* -- Layout -- */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 30px;
+        html {
+            margin: 0;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        p {
+            margin: 0 0 5px 0;
+            line-height: 1.4;
+        }
+
+        /* -- Page Layout -- */
+        .page-container {
+            padding: 30px 40px; /* Generous padding around the content */
             position: relative;
         }
 
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-left { text-align: left; }
-
-        .mb-4 { margin-bottom: 16px; }
-        .mb-5 { margin-bottom: 20px; }
-        .mt-4 { margin-top: 16px; }
-        .mt-5 { margin-top: 20px; }
-
         /* -- Header -- */
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding-bottom: 20px;
-            border-bottom: 1px solid #eaeaea;
             margin-bottom: 30px;
+            border-bottom: 2px solid #7675ff; /* Accent color border */
         }
 
-        .header-logo {
-            max-height: 70px;
-        }
-
-        .invoice-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #2563eb;
-            margin-bottom: 5px;
-        }
-
-        /* -- Details -- */
-        .details-wrapper {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-
-        .company-details {
-            width: 48%;
-        }
-
-        .invoice-details {
-            width: 48%;
-            text-align: right;
-        }
-
-        .detail-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #111;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-content {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: #666;
-            padding-right: 10px;
-        }
-
-        .detail-value {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .detail-table {
-            width: 100%;
-        }
-
-        .detail-table td {
-            padding: 4px 0;
-        }
-
-        /* -- Client Details -- */
-        .client-details-wrapper {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-
-        .client-billing {
-            width: 48%;
-        }
-
-        .client-shipping {
-            width: 48%;
-        }
-
-        /* -- Items Table -- */
-        .items-table-wrapper {
-            margin-bottom: 30px;
-        }
-
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .items-table th {
-            background-color: #f8f9fa;
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #eaeaea;
-        }
-
-        .items-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eaeaea;
+        .header-left {
+            width: 50%;
             vertical-align: top;
         }
 
-        .items-table .item-description {
-            font-size: 13px;
-            color: #666;
-            margin-top: 4px;
+        .header-logo img {
+            max-height: 60px; /* Adjust as needed */
+            max-width: 200px; /* Adjust as needed */
+            width: auto;
+            height: auto;
         }
 
-        /* -- Totals -- */
-        .totals-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 40px;
+        .header-company-name {
+            font-size: 16pt;
+            color: #7675ff; /* Accent color */
+            margin-top: 10px;
+        }
+
+        .header-right {
+            width: 50%;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .invoice-title {
+            font-size: 24pt;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .invoice-meta p {
+            font-size: 10pt;
+            color: #555;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* -- Address Section -- */
+        .address-section {
+            margin-bottom: 30px;
+            /* Using table for robust PDF layout */
+        }
+
+        .address-section td {
+            vertical-align: top;
+            padding-right: 20px;
+            font-size: 10pt;
+            line-height: 1.5;
+        }
+
+        .address-section .label {
+            font-weight: bold;
+            color: #555;
+            font-size: 9pt;
+            margin-bottom: 5px;
+            display: block; /* Make label appear above address */
+        }
+
+        .address-section h4 { /* Company Name / Customer Name */
+            font-size: 11pt;
+            margin-bottom: 5px;
+            color: #000;
+        }
+
+        .address-block {
+            color: #444;
+            word-wrap: break-word;
+        }
+
+        .company-address-col {
+            width: 35%;
+        }
+        .billing-address-col {
+            width: 30%;
+        }
+        .shipping-address-col {
+            width: 35%;
+        }
+
+
+        /* -- Items Table -- */
+        .items-table {
+            margin-bottom: 20px;
+            page-break-inside: auto; /* Allow table rows to break across pages */
+        }
+
+        .items-table thead th {
+            background-color: #f0f0f0; /* Light gray background for header */
+            color: #333;
+            font-weight: bold;
+            font-size: 9pt;
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid #ccc;
+            text-transform: uppercase; /* Optional: Makes headers stand out */
+        }
+
+        .items-table tbody td {
+            padding: 10px 8px;
+            vertical-align: top;
+            border-bottom: 1px solid #eee; /* Subtle row separator */
+            font-size: 10pt;
+        }
+
+        /* Give specific alignment to columns */
+        .items-table .col-description { text-align: left; width: 45%; }
+        .items-table .col-quantity { text-align: center; }
+        .items-table .col-price { text-align: right; }
+        .items-table .col-discount { text-align: right; }
+        .items-table .col-tax { text-align: right; }
+        .items-table .col-total { text-align: right; font-weight: bold; }
+
+        .items-table .item-description-notes {
+            font-size: 8pt;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        /* Zebra striping (optional, might not render perfectly in all PDF engines) */
+        /* .items-table tbody tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        } */
+
+
+        /* -- Totals Section -- */
+        .totals-section {
+            page-break-inside: avoid; /* Keep totals block together */
+            margin-top: 20px;
         }
 
         .totals-table {
-            width: 350px;
-            border-collapse: collapse;
-        }
-
-        .totals-table td {
-            padding: 8px 15px;
-        }
-
-        .totals-table .total-label {
-            text-align: left;
-            color: #555;
-        }
-
-        .totals-table .total-value {
-            text-align: right;
-            font-weight: 500;
-        }
-
-        .totals-table .grand-total {
-            font-size: 16px;
-            font-weight: 700;
-            color: #2563eb;
-            border-top: 2px solid #eaeaea;
-            padding-top: 12px;
-        }
-
-        /* -- Notes -- */
-        .notes-wrapper {
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-        }
-
-        .notes-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
+            width: 40%; /* Adjust width as needed */
+            float: right; /* Align to the right */
             color: #333;
         }
 
-        .notes-content {
-            font-size: 14px;
+        .totals-table td {
+            padding: 6px 10px;
+            font-size: 10pt;
+        }
+
+        .totals-table tr td:first-child {
+            text-align: right;
+            font-weight: normal;
             color: #555;
-            line-height: 1.6;
+        }
+
+        .totals-table tr td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .totals-table tr.grand-total td {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #000;
+            border-top: 2px solid #7675ff; /* Accent color border */
+            padding-top: 10px;
+        }
+
+
+        /* -- Notes Section -- */
+        .notes-section {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eee; /* Separator line */
+            clear: both; /* Clear floats from totals table */
+            page-break-inside: avoid;
+        }
+
+        .notes-label {
+            font-weight: bold;
+            font-size: 10pt;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .notes-content {
+            font-size: 9pt;
+            color: #555;
+            line-height: 1.5;
+            /* Optional: Prevent extremely long words from breaking layout */
+            word-wrap: break-word;
         }
 
         /* -- Footer -- */
         .footer {
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #eaeaea;
-            font-size: 13px;
-            color: #777;
+            position: fixed; /* Fixed position for footer */
+            bottom: -10px; /* Adjust position relative to bottom */
+            left: 0px;
+            right: 0px;
+            height: 40px; /* Footer height */
+
+            /* Styling */
             text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            font-size: 8pt;
+            color: #888;
         }
+
+        /* -- Helpers -- */
+        .text-primary { color: #7675ff; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .w-auto { width: auto; }
+        .clear { clear: both; }
+
     </style>
+
+    {{-- Include locale-specific CSS if needed --}}
+    @if (App::isLocale('th'))
+        @include('app.pdf.locale.th')
+    @endif
 </head>
 
 <body>
-<div class="container">
-    <!-- Header -->
-    <div class="header">
-        <div>
-            @if ($logo)
-                <img class="header-logo" src="{{ \App\Space\ImageUtils::toBase64Src($logo) }}" alt="Company Logo">
-            @else
-                @if ($invoice->customer->company)
-                    <h1 class="invoice-title">{{ $invoice->customer->company->name }}</h1>
+{{-- Optional: Add a footer element that PDF generators can place --}}
+<div class="footer">
+    Thank you for your business! | {{ $invoice->customer->company->name ?? 'Your Company Name' }}
+    {{-- You can add more footer info like page numbers if your PDF generator supports it --}}
+</div>
+
+<div class="page-container">
+    {{-- Header Section --}}
+    <table class="header">
+        <tr>
+            <td class="header-left">
+                @if ($logo)
+                    <div class="header-logo">
+                        <img src="{{ \App\Space\ImageUtils::toBase64Src($logo) }}" alt="Company Logo">
+                    </div>
+                @elseif ($invoice->customer->company)
+                    <h1 class="header-company-name">
+                        {{ $invoice->customer->company->name }}
+                    </h1>
                 @endif
-            @endif
-        </div>
-        <div class="text-right">
-            <div class="invoice-title">INVOICE</div>
-            <div class="detail-value">#{{ $invoice->invoice_number }}</div>
-        </div>
-    </div>
-
-    <!-- Company & Invoice Details -->
-    <div class="details-wrapper">
-        <div class="company-details">
-            <div class="detail-title">From</div>
-            <div class="detail-content">
-                {!! $company_address !!}
-            </div>
-        </div>
-
-        <div class="invoice-details">
-            <div class="detail-title">Invoice Details</div>
-            <table class="detail-table">
-                <tr>
-                    <td class="detail-label text-right">Invoice Number:</td>
-                    <td class="detail-value text-right">{{ $invoice->invoice_number }}</td>
-                </tr>
-                <tr>
-                    <td class="detail-label text-right">Invoice Date:</td>
-                    <td class="detail-value text-right">{{ $invoice->formattedInvoiceDate }}</td>
-                </tr>
-                <tr>
-                    <td class="detail-label text-right">Due Date:</td>
-                    <td class="detail-value text-right">{{ $invoice->formattedDueDate }}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Client Details -->
-    <div class="client-details-wrapper">
-        <div class="client-billing">
-            @if ($billing_address)
-                <div class="detail-title">Bill To</div>
-                <div class="detail-content">
-                    {!! $billing_address !!}
+                {{-- Company Name from Address Block can also go here if needed --}}
+            </td>
+            <td class="header-right">
+                <h1 class="invoice-title">@lang('pdf_invoice_label')</h1>
+                <div class="invoice-meta">
+                    <p><strong>@lang('pdf_invoice_number'):</strong> {{ $invoice->invoice_number }}</p>
+                    <p><strong>@lang('pdf_invoice_date'):</strong> {{ $invoice->formattedInvoiceDate }}</p>
+                    @if ($invoice->due_date)
+                        <p><strong>@lang('pdf_due_date'):</strong> {{ $invoice->formattedDueDate }}</p>
+                    @endif
                 </div>
-            @endif
-        </div>
+            </td>
+        </tr>
+    </table>
 
-        <div class="client-shipping">
-            @if ($shipping_address)
-                <div class="detail-title">Ship To</div>
-                <div class="detail-content">
-                    {!! $shipping_address !!}
+    {{-- Address Section --}}
+    <table class="address-section">
+        <tr>
+            <td class="company-address-col">
+                {{-- Displaying company info from $company_address --}}
+                {{-- Assume $company_address includes name and full address formatted --}}
+                <div class="address-block">
+                    {!! $company_address !!}
                 </div>
-            @endif
-        </div>
-    </div>
+            </td>
+            <td class="billing-address-col">
+                @if ($billing_address)
+                    <span class="label">@lang('pdf_bill_to')</span>
+                    <div class="address-block">
+                        {!! $billing_address !!}
+                    </div>
+                @endif
+            </td>
+            <td class="shipping-address-col">
+                @if ($shipping_address && trim(strip_tags($shipping_address)) !== '')
+                    <span class="label">@lang('pdf_ship_to')</span>
+                    <div class="address-block">
+                        {!! $shipping_address !!}
+                    </div>
+                @endif
+            </td>
+        </tr>
+    </table>
 
-    <!-- Items Table -->
-    <div class="items-table-wrapper">
-        <table class="items-table">
-            <thead>
-            <tr>
-                <th>Item</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th class="text-right">Amount</th>
-            </tr>
-            </thead>
+
+    {{-- Items Table --}}
+    {{-- Ensure the partial 'app.pdf.invoice.partials.table' uses the new classes --}}
+    {{-- You might need to update the partial to add classes like: --}}
+    {{-- <table class="items-table"> --}}
+    {{--  <thead><tr><th class="col-description">...</th><th class="col-quantity">... --}}
+    {{--  <tbody><tr><td class="col-description">... {!! $item->product->description !!} <div class="item-description-notes">Notes...</div> --}}
+    @include('app.pdf.invoice.partials.table')
+
+
+    {{-- Totals Section --}}
+    {{-- Ensure the partial 'app.pdf.invoice.partials.table' outputs totals separately or adjust here --}}
+    {{-- Assuming the totals are calculated and available in variables passed to the view --}}
+    {{-- You'll likely have these totals within the partial, but if not, structure them like this: --}}
+    <div class="totals-section">
+        <table class="totals-table">
             <tbody>
-            @foreach($invoice->items as $item)
+            <tr>
+                <td>@lang('pdf_subtotal')</td>
+                <td>{{ $invoice->sub_total }}</td> {{-- Adjust variable names as needed --}}
+            </tr>
+            @if($invoice->discount_total > 0)
                 <tr>
-                    <td>
-                        <div>{{ $item->name }}</div>
-                        @if($item->description)
-                            <div class="item-description">{{ $item->description }}</div>
-                        @endif
-                    </td>
-                    <td>{{ $item->quantity }}</td>
-                    <td>{{ $company->currency->symbol }}{{ $item->price }}</td>
-                    <td class="text-right">{{ $company->currency->symbol }}{{ $item->total }}</td>
+                    <td>@lang('pdf_discount')</td>
+                    <td>{{ $invoice->discount_total }}</td> {{-- Adjust variable names --}}
                 </tr>
+            @endif
+            @foreach($invoice->taxes as $tax) {{-- Example tax loop --}}
+            <tr>
+                <td>{{ $tax->name }} ({{ $tax->percent }}%)</td>
+                <td>{{ $tax->amount }}</td> {{-- Adjust variable names --}}
+            </tr>
             @endforeach
+            {{-- Add other totals like shipping if applicable --}}
+            <tr class="grand-total">
+                <td>@lang('pdf_total')</td>
+                <td>{{ $invoice->total }}</td> {{-- Adjust variable names --}}
+            </tr>
             </tbody>
         </table>
+        <div class="clear"></div>
     </div>
 
-    <!-- Totals -->
-    <div class="totals-wrapper">
-        <table class="totals-table">
-            <tr>
-                <td class="total-label">Subtotal:</td>
-                <td class="total-value">{{ $company->currency->symbol }}{{ $invoice->sub_total }}</td>
-            </tr>
-            @if($invoice->tax)
-                <tr>
-                    <td class="total-label">Tax ({{ $invoice->tax_rate }}%):</td>
-                    <td class="total-value">{{ $company->currency->symbol }}{{ $invoice->tax }}</td>
-                </tr>
-            @endif
-            @if($invoice->discount)
-                <tr>
-                    <td class="total-label">Discount:</td>
-                    <td class="total-value">{{ $company->currency->symbol }}{{ $invoice->discount }}</td>
-                </tr>
-            @endif
-            <tr>
-                <td class="total-label grand-total">Total:</td>
-                <td class="total-value grand-total">{{ $company->currency->symbol }}{{ $invoice->total }}</td>
-            </tr>
-        </table>
-    </div>
 
-    <!-- Notes -->
-    @if ($notes)
-        <div class="notes-wrapper">
-            <div class="notes-title">Notes</div>
+    {{-- Notes Section --}}
+    @if ($notes && trim(strip_tags($notes)) !== '')
+        <div class="notes-section">
+            <div class="notes-label">
+                @lang('pdf_notes')
+            </div>
             <div class="notes-content">
                 {!! $notes !!}
             </div>
         </div>
     @endif
 
-    <!-- Footer -->
-    <div class="footer">
-        <p>Thank you for your business!</p>
-    </div>
-</div>
+</div> {{-- End Page Container --}}
 </body>
+
 </html>
